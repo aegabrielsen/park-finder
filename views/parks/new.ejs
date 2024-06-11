@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Park</title>
+  </head>
+  <body>
+    <form action="/parks" method="POST">
+      <div>
+        <label for="title">Title</label>
+        <input type="text" name="park[title]" id="title" />
+      </div>
+      <div>
+        <label for="location">Location</label>
+        <input type="text" name="park[location]" id="location" />
+      </div>
+      <button>Add Park</button>
+    </form>
+    <a href="/parks">Return to index</a>
+  </body>
+</html>

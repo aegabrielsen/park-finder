@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Park</title>
+  </head>
+  <body>
+    <form action="/parks/<%=park._id %>?_method=put" method="POST">
+      <div>
+        <label for="title">Title</label>
+        <input
+          type="text"
+          name="park[title]"
+          id="title"
+          value="<%=park.title %>"
+        />
+      </div>
+      <div>
+        <label for="location">Location</label>
+        <input
+          type="text"
+          name="park[location]"
+          id="location"
+          value="<%=park.location %>"
+        />
+      </div>
+      <button>Edit Park</button>
+    </form>
+    <a href="/parks/<%=park._id %>">Return to index</a>
+  </body>
+</html>

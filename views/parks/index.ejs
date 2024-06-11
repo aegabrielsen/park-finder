@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Parks</title>
+  </head>
+  <body>
+    <h1>All Parks</h1>
+    <ul>
+      <% for(let park of parks) { %>
+      <li><a href="parks/<%=park._id%>"><%=park.title %></a></li>
+      <% } %>
+    </ul>
+    <a href="parks/new">Create new park</a>
+  </body>
+</html>
