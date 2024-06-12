@@ -20,7 +20,12 @@ const seedDB = async () => {
     const park = new Park({
       location: `${cities[random1000].city}, ${cities[random1000].state}`,
       title: `${sample(descriptors)} ${sample(places)}`,
-      price: `${Math.floor(Math.random() * 10)}`,
+      // price: `${Math.floor(Math.random() * 10)}`,
+      image:
+        "https://images.unsplash.com/photo-1502946522238-41a16aa200fa?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxjb2xsZWN0aW9uLXBhZ2V8MjB8OTkxMjM2Mnx8ZW58MHx8fHx8",
+      description:
+        "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Voluptatum corrupti consequuntur commodi, esse quisquam distinctio atque doloribus amet repellat delectus et! Atque exercitationem nihil iure voluptate sapiente quia eos quisquam?",
+      price: Math.floor(Math.random() * 10),
     });
     await park.save();
   }

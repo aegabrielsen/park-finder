@@ -1,32 +1,71 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Edit Park</title>
-  </head>
-  <body>
+<% layout('layouts/boilerplate') %>
+
+<div class="row">
+  <h1 class="text-center">New Campground</h1>
+  <div class="col-6 offset-3">
     <form action="/parks/<%=park._id %>?_method=put" method="POST">
-      <div>
-        <label for="title">Title</label>
+      <div class="mb-3">
+        <label class="form-label" for="title">Title</label>
         <input
+          class="form-control"
           type="text"
           name="park[title]"
           id="title"
           value="<%=park.title %>"
         />
       </div>
-      <div>
-        <label for="location">Location</label>
+      <div class="mb-3">
+        <label class="form-label" for="location">Location</label>
         <input
+          class="form-control"
           type="text"
           name="park[location]"
           id="location"
           value="<%=park.location %>"
         />
       </div>
-      <button>Edit Park</button>
+      <div class="mb-3">
+        <label class="form-label" for="image">Image URL</label>
+        <input
+          class="form-control"
+          type="text"
+          name="park[image]"
+          id="image"
+          value="<%=park.image %>"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="price">Price</label>
+        <div class="input-group mb-3">
+          <span class="input-group-text" id="price-label">$</span>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="0.00"
+            aria-label="price"
+            aria-describedby="price-label"
+            name="park[price]"
+            value="<%=park.price %>"
+          />
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="description">Description</label>
+        <textarea
+          class="form-control"
+          type="text"
+          name="park[description]"
+          id="description"
+        >
+<%= park.description %></textarea
+        >
+      </div>
+      <div class="mb-3">
+        <button class="btn btn-info">Update Park</button>
+      </div>
     </form>
-    <a href="/parks/<%=park._id %>">Return to index</a>
-  </body>
-</html>
+    <a href="/parks">Return to index</a>
+  </div>
+</div>
