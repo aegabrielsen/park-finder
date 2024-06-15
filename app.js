@@ -1,6 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const ejsMate = require("ejs-mate");
+const { parkSchema } = require("./schemas");
+const catchAsync = require("./utils/catchAsync");
+const ExpressError = require("./utils/ExpressError");
 const path = require("path");
 const Park = require("./models/park");
 const methodOverride = require("method-override");
@@ -22,45 +25,88 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 
+const validatePark = (req, res, next) => {
+  const { error } = parkSchema.validate(req.body);
+
+  if (error) {
+    const msg = error.details.map((el) => el.message).join(",");
+    throw new ExpressError(msg, 400);
+  } else {
+    next();
+  }
+};
+
 app.get("/", (req, res) => {
   res.render("home");
 });
 
-app.get("/parks", async (req, res) => {
-  const parks = await Park.find({});
-  res.render("parks/index", { parks });
-});
+app.get(
+  "/parks",
+  catchAsync(async (req, res, next) => {
+    const parks = await Park.find({});
+    res.render("parks/index", { parks });
+  })
+);
 
 app.get("/parks/new", (req, res) => {
   res.render("parks/new");
 });
 
-app.post("/parks", async (req, res) => {
-  const park = new Park(req.body.park);
-  await park.save();
-  res.redirect(`parks/${park._id}`);
+app.post(
+  "/parks",
+  validatePark,
+  catchAsync(async (req, res, next) => {
+    // if (!req.body.park) throw new ExpressError("Invalid Park Data", 400);
+
+    const park = new Park(req.body.park);
+    await park.save();
+    res.redirect(`parks/${park._id}`);
+  })
+);
+
+app.get(
+  "/parks/:id",
+  catchAsync(async (req, res) => {
+    const park = await Park.findById(req.params.id);
+    res.render("parks/show", { park });
+  })
+);
+
+app.get(
+  "/parks/:id/edit",
+  catchAsync(async (req, res) => {
+    const park = await Park.findById(req.params.id);
+    res.render("parks/edit", { park });
+  })
+);
+
+app.put(
+  "/parks/:id",
+  validatePark,
+  catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const park = await Park.findByIdAndUpdate(id, { ...req.body.park });
+    res.redirect(`/parks/${park._id}`);
+  })
+);
+
+app.delete(
+  "/parks/:id",
+  catchAsync(async (req, res) => {
+    const { id } = req.params;
+    await Park.findByIdAndDelete(id);
+    res.redirect("/parks");
+  })
+);
+
+app.all("*", (req, res, next) => {
+  next(new ExpressError("Page Not Found", 404));
 });
 
-app.get("/parks/:id", async (req, res) => {
-  const park = await Park.findById(req.params.id);
-  res.render("parks/show", { park });
-});
-
-app.get("/parks/:id/edit", async (req, res) => {
-  const park = await Park.findById(req.params.id);
-  res.render("parks/edit", { park });
-});
-
-app.put("/parks/:id", async (req, res) => {
-  const { id } = req.params;
-  const park = await Park.findByIdAndUpdate(id, { ...req.body.park });
-  res.redirect(`/parks/${park._id}`);
-});
-
-app.delete("/parks/:id", async (req, res) => {
-  const { id } = req.params;
-  await Park.findByIdAndDelete(id);
-  res.redirect("/parks");
+app.use((err, req, res, next) => {
+  const { statusCode = 500 } = err;
+  if (!err.message) err.message = "Oh no, something went wrong!";
+  res.status(statusCode).render("error", { err });
 });
 
 app.listen(3000, () => {
