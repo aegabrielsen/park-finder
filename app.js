@@ -9,6 +9,8 @@ const Park = require("./models/park");
 const Review = require("./models/review");
 const methodOverride = require("method-override");
 
+const parks = require("./routes/parks");
+
 mongoose.connect("mongodb://localhost:27017/park-finder");
 
 const db = mongoose.connection;
@@ -26,17 +28,6 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 
-const validatePark = (req, res, next) => {
-  const { error } = parkSchema.validate(req.body);
-
-  if (error) {
-    const msg = error.details.map((el) => el.message).join(",");
-    throw new ExpressError(msg, 400);
-  } else {
-    next();
-  }
-};
-
 const validateReview = (req, res, next) => {
   const { error } = reviewSchema.validate(req.body);
 
@@ -48,68 +39,11 @@ const validateReview = (req, res, next) => {
   }
 };
 
+app.use("/parks", parks);
+
 app.get("/", (req, res) => {
   res.render("home");
 });
-
-app.get(
-  "/parks",
-  catchAsync(async (req, res, next) => {
-    const parks = await Park.find({});
-    res.render("parks/index", { parks });
-  })
-);
-
-app.get("/parks/new", (req, res) => {
-  res.render("parks/new");
-});
-
-app.post(
-  "/parks",
-  validatePark,
-  catchAsync(async (req, res, next) => {
-    // if (!req.body.park) throw new ExpressError("Invalid Park Data", 400);
-
-    const park = new Park(req.body.park);
-    await park.save();
-    res.redirect(`parks/${park._id}`);
-  })
-);
-
-app.get(
-  "/parks/:id",
-  catchAsync(async (req, res) => {
-    const park = await Park.findById(req.params.id).populate("reviews");
-    res.render("parks/show", { park });
-  })
-);
-
-app.get(
-  "/parks/:id/edit",
-  catchAsync(async (req, res) => {
-    const park = await Park.findById(req.params.id);
-    res.render("parks/edit", { park });
-  })
-);
-
-app.put(
-  "/parks/:id",
-  validatePark,
-  catchAsync(async (req, res) => {
-    const { id } = req.params;
-    const park = await Park.findByIdAndUpdate(id, { ...req.body.park });
-    res.redirect(`/parks/${park._id}`);
-  })
-);
-
-app.delete(
-  "/parks/:id",
-  catchAsync(async (req, res) => {
-    const { id } = req.params;
-    await Park.findByIdAndDelete(id);
-    res.redirect("/parks");
-  })
-);
 
 app.post(
   "/parks/:id/reviews",
