@@ -1,11 +1,12 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const ejsMate = require("ejs-mate");
-const { parkSchema } = require("./schemas");
+const { parkSchema, reviewSchema } = require("./schemas");
 const catchAsync = require("./utils/catchAsync");
 const ExpressError = require("./utils/ExpressError");
 const path = require("path");
 const Park = require("./models/park");
+const Review = require("./models/review");
 const methodOverride = require("method-override");
 
 mongoose.connect("mongodb://localhost:27017/park-finder");
@@ -27,6 +28,17 @@ app.use(methodOverride("_method"));
 
 const validatePark = (req, res, next) => {
   const { error } = parkSchema.validate(req.body);
+
+  if (error) {
+    const msg = error.details.map((el) => el.message).join(",");
+    throw new ExpressError(msg, 400);
+  } else {
+    next();
+  }
+};
+
+const validateReview = (req, res, next) => {
+  const { error } = reviewSchema.validate(req.body);
 
   if (error) {
     const msg = error.details.map((el) => el.message).join(",");
@@ -67,7 +79,7 @@ app.post(
 app.get(
   "/parks/:id",
   catchAsync(async (req, res) => {
-    const park = await Park.findById(req.params.id);
+    const park = await Park.findById(req.params.id).populate("reviews");
     res.render("parks/show", { park });
   })
 );
@@ -96,6 +108,29 @@ app.delete(
     const { id } = req.params;
     await Park.findByIdAndDelete(id);
     res.redirect("/parks");
+  })
+);
+
+app.post(
+  "/parks/:id/reviews",
+  validateReview,
+  catchAsync(async (req, res) => {
+    const park = await Park.findById(req.params.id);
+    const review = new Review(req.body.review);
+    park.reviews.push(review);
+    await review.save();
+    await park.save();
+    res.redirect(`/parks/${park._id}`);
+  })
+);
+
+app.delete(
+  "/parks/:id/reviews/:reviewId",
+  catchAsync(async (req, res) => {
+    const { id, reviewId } = req.params;
+    await Park.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
+    await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/parks/${id}`);
   })
 );
 
