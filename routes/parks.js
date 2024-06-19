@@ -34,6 +34,7 @@ router.post(
   catchAsync(async (req, res, next) => {
     const park = new Park(req.body.park);
     await park.save();
+    req.flash("success", "Sucessfully made a new park!");
     res.redirect(`parks/${park._id}`);
   })
 );
@@ -42,6 +43,10 @@ router.get(
   "/:id",
   catchAsync(async (req, res) => {
     const park = await Park.findById(req.params.id).populate("reviews");
+    if (!park) {
+      req.flash("error", "Cannot find that park");
+      res.redirect("/parks");
+    }
     res.render("parks/show", { park });
   })
 );
@@ -50,6 +55,10 @@ router.get(
   "/:id/edit",
   catchAsync(async (req, res) => {
     const park = await Park.findById(req.params.id);
+    if (!park) {
+      req.flash("error", "Cannot find that park");
+      res.redirect("/parks");
+    }
     res.render("parks/edit", { park });
   })
 );
@@ -60,6 +69,7 @@ router.put(
   catchAsync(async (req, res) => {
     const { id } = req.params;
     const park = await Park.findByIdAndUpdate(id, { ...req.body.park });
+    req.flash("success", "Sucessfully updated a park!");
     res.redirect(`/parks/${park._id}`);
   })
 );
@@ -69,6 +79,7 @@ router.delete(
   catchAsync(async (req, res) => {
     const { id } = req.params;
     await Park.findByIdAndDelete(id);
+    req.flash("success", "Deleted a park :(");
     res.redirect("/parks");
   })
 );

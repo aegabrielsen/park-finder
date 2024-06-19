@@ -1,15 +1,14 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const ejsMate = require("ejs-mate");
-const { parkSchema, reviewSchema } = require("./schemas");
-const catchAsync = require("./utils/catchAsync");
+const session = require("express-session");
+const flash = require("connect-flash");
 const ExpressError = require("./utils/ExpressError");
 const path = require("path");
-const Park = require("./models/park");
-const Review = require("./models/review");
 const methodOverride = require("method-override");
 
 const parks = require("./routes/parks");
+const reviews = require("./routes/reviews");
 
 mongoose.connect("mongodb://localhost:27017/park-finder");
 
@@ -27,46 +26,33 @@ app.set("views", path.join(__dirname, "views"));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
+app.use(express.static(path.join(__dirname, "public")));
 
-const validateReview = (req, res, next) => {
-  const { error } = reviewSchema.validate(req.body);
-
-  if (error) {
-    const msg = error.details.map((el) => el.message).join(",");
-    throw new ExpressError(msg, 400);
-  } else {
-    next();
-  }
+const sessionConfig = {
+  secret: "thiswillbechangedtobemoresecure",
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true,
+    expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+  },
 };
+app.use(session(sessionConfig));
+app.use(flash());
+
+app.use((req, res, next) => {
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  next();
+});
 
 app.use("/parks", parks);
+app.use("/parks/:id/reviews", reviews);
 
 app.get("/", (req, res) => {
   res.render("home");
 });
-
-app.post(
-  "/parks/:id/reviews",
-  validateReview,
-  catchAsync(async (req, res) => {
-    const park = await Park.findById(req.params.id);
-    const review = new Review(req.body.review);
-    park.reviews.push(review);
-    await review.save();
-    await park.save();
-    res.redirect(`/parks/${park._id}`);
-  })
-);
-
-app.delete(
-  "/parks/:id/reviews/:reviewId",
-  catchAsync(async (req, res) => {
-    const { id, reviewId } = req.params;
-    await Park.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
-    await Review.findByIdAndDelete(reviewId);
-    res.redirect(`/parks/${id}`);
-  })
-);
 
 app.all("*", (req, res, next) => {
   next(new ExpressError("Page Not Found", 404));
