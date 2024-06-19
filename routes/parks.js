@@ -4,6 +4,7 @@ const catchAsync = require("../utils/catchAsync");
 const ExpressError = require("../utils/ExpressError");
 const Park = require("../models/park");
 const { parkSchema } = require("../schemas");
+const { isLoggedIn } = require("../middleware");
 
 const validatePark = (req, res, next) => {
   const { error } = parkSchema.validate(req.body);
@@ -24,12 +25,13 @@ router.get(
   })
 );
 
-router.get("/new", (req, res) => {
+router.get("/new", isLoggedIn, (req, res) => {
   res.render("parks/new");
 });
 
 router.post(
   "/",
+  isLoggedIn,
   validatePark,
   catchAsync(async (req, res, next) => {
     const park = new Park(req.body.park);
@@ -53,6 +55,7 @@ router.get(
 
 router.get(
   "/:id/edit",
+  isLoggedIn,
   catchAsync(async (req, res) => {
     const park = await Park.findById(req.params.id);
     if (!park) {
@@ -65,6 +68,7 @@ router.get(
 
 router.put(
   "/:id",
+  isLoggedIn,
   validatePark,
   catchAsync(async (req, res) => {
     const { id } = req.params;
@@ -76,6 +80,7 @@ router.put(
 
 router.delete(
   "/:id",
+  isLoggedIn,
   catchAsync(async (req, res) => {
     const { id } = req.params;
     await Park.findByIdAndDelete(id);
