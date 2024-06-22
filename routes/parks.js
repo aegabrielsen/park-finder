@@ -4,25 +4,28 @@ const parks = require("../controllers/parks");
 const catchAsync = require("../utils/catchAsync");
 const Park = require("../models/park");
 const { isLoggedIn, isAuthor, validatePark } = require("../middleware");
+const multer = require("multer");
+const { storage } = require("../cloudinary");
+const upload = multer({ storage });
 
-router.get("/", catchAsync(parks.index));
+router
+  .route("/")
+  .get(catchAsync(parks.index))
+  .post(
+    isLoggedIn,
+    upload.array("image"),
+    validatePark,
+    catchAsync(parks.createPark)
+  );
 
 router.get("/new", isLoggedIn, parks.renderNewForm);
 
-router.post("/", isLoggedIn, validatePark, catchAsync(parks.createPark));
-
-router.get("/:id", catchAsync(parks.showPark));
+router
+  .route("/:id")
+  .get(catchAsync(parks.showPark))
+  .put(isLoggedIn, isAuthor, validatePark, catchAsync(parks.updatePark))
+  .delete(isLoggedIn, isAuthor, catchAsync(parks.destroyPark));
 
 router.get("/:id/edit", isLoggedIn, isAuthor, catchAsync(parks.renderEditForm));
-
-router.put(
-  "/:id",
-  isLoggedIn,
-  isAuthor,
-  validatePark,
-  catchAsync(parks.updatePark)
-);
-
-router.delete("/:id", isLoggedIn, isAuthor, catchAsync(parks.destroyPark));
 
 module.exports = router;

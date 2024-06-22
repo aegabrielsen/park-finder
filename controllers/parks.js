@@ -11,6 +11,7 @@ module.exports.renderNewForm = (req, res) => {
 
 module.exports.createPark = async (req, res, next) => {
   const park = new Park(req.body.park);
+  park.images = req.files.map((f) => ({ url: f.path, filename: f.filename }));
   park.author = req.user._id;
   await park.save();
   req.flash("success", "Sucessfully made a new park!");
