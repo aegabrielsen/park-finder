@@ -23,7 +23,13 @@ router.get("/new", isLoggedIn, parks.renderNewForm);
 router
   .route("/:id")
   .get(catchAsync(parks.showPark))
-  .put(isLoggedIn, isAuthor, validatePark, catchAsync(parks.updatePark))
+  .put(
+    isLoggedIn,
+    isAuthor,
+    upload.array("image"),
+    validatePark,
+    catchAsync(parks.updatePark)
+  )
   .delete(isLoggedIn, isAuthor, catchAsync(parks.destroyPark));
 
 router.get("/:id/edit", isLoggedIn, isAuthor, catchAsync(parks.renderEditForm));

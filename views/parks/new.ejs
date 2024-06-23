@@ -32,7 +32,8 @@
         />
         <div class="valid-feedback">Looks good!</div>
       </div>
-      <input type="file" name="image" multiple />
+
+      <!-- <input type="file" name="image" multiple /> -->
       <!-- <div class="mb-3">
         <label class="form-label" for="image">Image URL</label>
         <input
@@ -61,7 +62,16 @@
           <div class="valid-feedback">Looks good!</div>
         </div>
       </div>
-
+      <div class="mb-3">
+        <label for="image" class="form-label">Select Photo(s)...</label>
+        <input
+          class="form-control"
+          type="file"
+          id="image"
+          name="image"
+          multiple
+        />
+      </div>
       <div class="mb-3">
         <label class="form-label" for="description">Description</label>
         <textarea
