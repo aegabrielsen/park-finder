@@ -15,14 +15,20 @@ const sample = (array) => array[Math.floor(Math.random() * array.length)];
 
 const seedDB = async () => {
   await Park.deleteMany({});
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 400; i++) {
     const random1000 = Math.floor(Math.random() * 1000);
     const park = new Park({
       // YOUR USER ID
       author: "667347b9972d0841a8672b7d",
       location: `${cities[random1000].city}, ${cities[random1000].state}`,
       title: `${sample(descriptors)} ${sample(places)}`,
-      geometry: { type: "Point", coordinates: [-122.330284, 47.603245] },
+      geometry: {
+        type: "Point",
+        coordinates: [
+          cities[random1000].longitude,
+          cities[random1000].latitude,
+        ],
+      },
       // price: `${Math.floor(Math.random() * 10)}`,
       // image:
       //   "https://images.unsplash.com/photo-1502946522238-41a16aa200fa?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxjb2xsZWN0aW9uLXBhZ2V8MjB8OTkxMjM2Mnx8ZW58MHx8fHx8",
