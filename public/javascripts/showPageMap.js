@@ -6,6 +6,8 @@ const map = new mapboxgl.Map({
   zoom: 9, // starting zoom
 });
 
+map.addControl(new mapboxgl.NavigationControl());
+
 new mapboxgl.Marker({ color: "#00BCD4" })
   .setLngLat(park.geometry.coordinates)
   .setPopup(
