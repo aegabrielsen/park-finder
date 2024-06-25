@@ -2,6 +2,8 @@
 
 <div id="cluster-map"></div>
 
+<br />
+
 <h1>All Parks</h1>
 
 <% for(let park of parks) { %>
@@ -9,9 +11,15 @@
   <div class="row">
     <div class="col-md-4">
       <% if(park.images.length) { %>
-      <img class="img-fluid" alt="" src="<%= park.images[0].url %>" />
+      <img
+        crossorigin="anonymous"
+        class="img-fluid"
+        alt=""
+        src="<%= park.images[0].url %>"
+      />
       <% } else {%>
       <img
+        crossorigin="anonymous"
         class="img-fluid"
         alt=""
         src="https://res.cloudinary.com/dkwnbkb3y/image/upload/v1719016274/ParkFinder/eqphqzltakon7wwkteu6.png"
@@ -39,8 +47,12 @@
   const parks = {features: <%- JSON.stringify(parks) %>};
 </script>
 <link
+  crossorigin="anonymous"
   href="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.css"
   rel="stylesheet"
 />
-<script src="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.js"></script>
+<script
+  crossorigin="anonymous"
+  src="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.js"
+></script>
 <script src="/javascripts/clusterMap.js"></script>
