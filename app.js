@@ -15,6 +15,7 @@ const LocalStrategy = require("passport-local");
 const User = require("./models/user");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
+const favicon = require("serve-favicon");
 
 const MongoStore = require("connect-mongo");
 
@@ -38,6 +39,8 @@ app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
+app.use(favicon(path.join(__dirname, "favicon.ico")));
+// app.use(favicon(__dirname + "/favicon.ico"));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
