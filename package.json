@@ -1,4 +1,7 @@
 {
+  "engines": {
+    "node": "18.13.0"
+  },
   "name": "park-finder",
   "version": "1.0.0",
   "description": "",
