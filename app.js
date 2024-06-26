@@ -16,11 +16,15 @@ const User = require("./models/user");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 
+const MongoStore = require("connect-mongo");
+
 const parkRoutes = require("./routes/parks");
 const reviewRoutes = require("./routes/reviews");
 const userRoutes = require("./routes/users");
 
-mongoose.connect("mongodb://localhost:27017/park-finder");
+const dbUrl = process.env.DB_URL || "mongodb://localhost:27017/park-finder";
+
+mongoose.connect(dbUrl);
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
@@ -39,9 +43,24 @@ app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(mongoSanitize());
 
+const secret = process.env.SECRET || "thisshouldbeabettersecret!";
+
+const store = MongoStore.create({
+  mongoUrl: dbUrl,
+  touchAfter: 24 * 60 * 60,
+  crypto: {
+    secret,
+  },
+});
+
+store.on("error", function (e) {
+  console.log("SESSION STORE ERROR");
+});
+
 const sessionConfig = {
+  store,
   name: "session",
-  secret: "thiswillbechangedtobemoresecure",
+  secret,
   resave: false,
   saveUninitialized: true,
   cookie: {
