@@ -16,6 +16,7 @@ const User = require("./models/user");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const favicon = require("serve-favicon");
+const port = process.env.PORT || 4000;
 
 const MongoStore = require("connect-mongo");
 
@@ -154,6 +155,6 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render("error", { err });
 });
 
-app.listen(3000, () => {
-  console.log("Serving on port 3000");
+app.listen(port, () => {
+  console.log(`Serving on port ${port}`);
 });
