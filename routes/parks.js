@@ -3,7 +3,12 @@ const router = express.Router();
 const parks = require("../controllers/parks");
 const catchAsync = require("../utils/catchAsync");
 const Park = require("../models/park");
-const { isLoggedIn, isAuthor, validatePark } = require("../middleware");
+const {
+  isLoggedIn,
+  isAuthor,
+  validatePark,
+  isAdmin,
+} = require("../middleware");
 const multer = require("multer");
 const { storage } = require("../cloudinary");
 const upload = multer({ storage });
@@ -15,6 +20,7 @@ router
     isLoggedIn,
     upload.array("image"),
     validatePark,
+    isAdmin,
     catchAsync(parks.createPark)
   );
 
@@ -26,6 +32,7 @@ router
   .put(
     isLoggedIn,
     isAuthor,
+    isAdmin,
     upload.array("image"),
     validatePark,
     catchAsync(parks.updatePark)

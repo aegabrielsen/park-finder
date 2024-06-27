@@ -39,6 +39,15 @@ module.exports.isAuthor = async (req, res, next) => {
   }
   next();
 };
+module.exports.isAdmin = async (req, res, next) => {
+  const { id } = req.params;
+  // const park = await Park.findById(id);
+  if (!req.user._id.equals("667b51535b7b8d46545d3020")) {
+    req.flash("error", "You do not have permission to do that");
+    return res.redirect(`/parks/${id}`);
+  }
+  next();
+};
 
 module.exports.isReviewAuthor = async (req, res, next) => {
   const { id, reviewId } = req.params;
